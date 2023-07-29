@@ -13,7 +13,7 @@ jobs:
         run: echo "The runner is using  operating system."
 
       - name: Check Runner Labels
-        run: echo "The runner has the following labels: "
+        run: echo "The runner has the following labels:"
 
       - name: List Available Runners
         run: |
