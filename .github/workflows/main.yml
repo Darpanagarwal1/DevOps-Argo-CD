@@ -1,0 +1,21 @@
+name: Check Available Runners
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  check-runners:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check Runner OS
+        run: echo "The runner is using  operating system."
+
+      - name: Check Runner Labels
+        run: echo "The runner has the following labels: "
+
+      - name: List Available Runners
+        run: |
+          echo "Available runners:"
+          github-runner list
