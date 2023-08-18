@@ -1,10 +1,21 @@
-name: Actions Runner Controller Demo
+name: Check Available Runners
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - '*'
 
 jobs:
-  Explore-GitHub-Actions:
-    # You need to use the INSTALLATION_NAME from the previous step
-    runs-on: arc-runner-set
+  check-runners:
+    runs-on: self-hosted
+    
     steps:
-    - run: echo "🎉 This job uses runner scale set runners!"
+      - name: Check Runner OS
+        run: echo "The runner is using  operating system."
+
+      - name: Check Runner Labels
+        run: echo "The runner has the following labels:"
+
+      - name: List Available Runners
+        run: |
+          echo "Available runners:"
+          github-runner list
