@@ -10,7 +10,7 @@ jobs:
     
     steps:
       - name: Check Runner OS
-        run: echo "The runner is using  operating system.."
+        run: echo "The runner is using  operating system..."
 
       - name: Check Runner Labels
         run: echo "The runner has the following labels:"
