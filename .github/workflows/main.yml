@@ -33,7 +33,7 @@ jobs:
 
     - name: Build database project
       working-directory: MyDatabaseProject
-      run: mono /usr/bin/msbuild MyDatabase.sqlproj /p:Configuration=Release
+      run: mono /usr/bin/xbuild MyDatabase.sqlproj /p:Configuration=Release
 
 
     - name: Download artifact
