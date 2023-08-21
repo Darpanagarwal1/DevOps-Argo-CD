@@ -6,7 +6,7 @@ on:
 
 jobs:
   check-runners:
-    runs-on: arc-runner-set
+    runs-on: arc-runner-set2
     
     steps:
       - name: Check Runner OS
