@@ -21,9 +21,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Remove existing dotnet packages
+    - name: Remove conflicting packages and sources
       run: |
-        sudo apt remove dotnet* aspnetcore* netstandard* -y
+        sudo apt-get update
+        sudo apt-get remove -y dotnet-sdk-3.1 dotnet-sdk-5.0 # Remove other versions if installed
         sudo rm /etc/apt/sources.list.d/microsoft-prod.list
 
     - name: Install Curl
