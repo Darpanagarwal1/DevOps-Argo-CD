@@ -1,4 +1,4 @@
-name: build-and-deploy-sql
+name: build-workflow
 
 on:
   pull_request:
@@ -18,28 +18,21 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Setup MSBuild
-      run: choco install visualstudio2019buildtools --package-parameters "--includeRecommended --includeOptional"
-      shell: cmd
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.3.1
 
-    - name: Build database project
-      working-directory: MyDatabaseProject
-      run: |
-        $projectPath = "MyDatabase.sqlproj"
-        & "C:\PROGRA~2\MICROS~2\2019\ENTERP~1\MSBuild\Current\Bin\MSBuild.exe" $projectPath /p:Configuration=Release
-
-
-
-
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: db
-        path: db
+      - name: Build Database project
+        run: |
+          msbuild.exe MyDatabase.sqlproj /p:Configuration=Release
+          
+      - name: Publish artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: db
+          path: MyDatabaseProject/bin/Release/
 
   deploy:
     name: Deploy to test environment
