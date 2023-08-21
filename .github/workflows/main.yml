@@ -30,10 +30,14 @@ jobs:
       run: |
         pwd
         ls -la
+        mono --version
+        msbuild --version
+
 
     - name: Build database project
-      working-directory: MyDatabaseProject # Adjust the path based on your project structure
-      run: msbuild MyDatabase.sqlproj /p:Configuration=Release
+      working-directory: MyDatabaseProject
+      run: mono /usr/bin/msbuild MyDatabase.sqlproj /p:Configuration=Release
+
 
     - name: Download artifact
       uses: actions/download-artifact@v2
