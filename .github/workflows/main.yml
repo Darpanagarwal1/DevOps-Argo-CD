@@ -30,9 +30,6 @@ jobs:
       run: |
         pwd
         ls -la
-        mono --version
-        msbuild --version
-
 
     - name: Build database project
       working-directory: MyDatabaseProject
