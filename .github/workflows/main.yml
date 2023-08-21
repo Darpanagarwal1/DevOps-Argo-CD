@@ -36,7 +36,7 @@ jobs:
 
 
     - name: Build database project
-      working-directory: Axco.ClientAdmin.Publishing.Host
+      working-directory: MyDatabaseProject
       run: dotnet build MyDatabase.csproj --configuration Release
 
     - name: Download artifact
