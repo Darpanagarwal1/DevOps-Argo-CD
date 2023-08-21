@@ -28,10 +28,9 @@ jobs:
     - name: Build database project
       working-directory: MyDatabaseProject
       run: |
-        $msbuildPath = "C:\PROGRA~2\MICROS~2\2019\ENTERP~1\MSBuild\Current\Bin\MSBuild.exe"
         $projectPath = "MyDatabase.sqlproj"
-        Set-Location -Path (Get-Item -Path ".\").FullName
-        & $msbuildPath $projectPath /p:Configuration=Release
+        & "C:\PROGRA~2\MICROS~2\2019\ENTERP~1\MSBuild\Current\Bin\MSBuild.exe" $projectPath /p:Configuration=Release
+
 
 
 
