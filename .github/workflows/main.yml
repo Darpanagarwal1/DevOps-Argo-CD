@@ -25,7 +25,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.3.1
 
       - name: Build Database project
-        working-directory: "MyDatabase"
+        working-directory: "MyDatabaseProject"
         run: |
           msbuild.exe MyDatabase.sqlproj /p:Configuration=Release
           
