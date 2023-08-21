@@ -4,11 +4,13 @@ on:
   pull_request:
     branches:
       - dev
+      - main
   push:
     branches:
       - dev
+      - main
     tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
   deploy:
@@ -24,9 +26,14 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y mono-complete
 
+    - name: List Files and Folders in Current Directory
+      run: |
+        pwd
+        ls -la
+
     - name: Build database project
-      working-directory: src/AdvWorkFlow # Adjust the path based on your project structure
-      run: msbuild AdvWorkFlow.sqlproj /p:Configuration=Release
+      working-directory: MyDatabaseProject # Adjust the path based on your project structure
+      run: msbuild MyDatabase.sqlproj /p:Configuration=Release
 
     - name: Download artifact
       uses: actions/download-artifact@v2
