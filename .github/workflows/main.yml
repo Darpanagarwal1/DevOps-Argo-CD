@@ -1,4 +1,4 @@
-name: build-workflow
+name: build-and-deploy-sql
 
 on:
   pull_request:
@@ -13,55 +13,51 @@ on:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
-  deploy:
-    name: Deploy to test environment
-    runs-on: arc-runner-set2 # Use self-hosted runner
-
-    container:
-      image: docker:latest # Use the Docker image
+  build:
+    name: Build SQL project
+    runs-on: windows-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Install .NET SDK
-        run: |
-          apt-get update && apt-get install -y wget
-          wget https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-          dpkg -i packages-microsoft-prod.deb
-          apt-get update
-          apt-get install -y dotnet-sdk-6.0
-          rm packages-microsoft-prod.deb
+    - name: Setup MSBuild
+      run: choco install visualstudio2019buildtools --package-parameters "--includeRecommended --includeOptional"
+      shell: cmd
 
-      - name: Build database project
-        working-directory: MyDatabaseProject
-        run: dotnet build MyDatabase.sqlproj --configuration Release
+    - name: Build database project
+      working-directory: MyDatabaseProject # Adjust the path based on your project structure
+      run: msbuild MyDatabase.sqlproj /p:Configuration=Release
 
-      - name: Download artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: db
-          path: db
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: db
+        path: db
 
-      - name: Install SqlPackage
-        run: |
-          apt-get update
-          apt-get install -y sqlpackage
+  deploy:
+    name: Deploy to test environment
+    runs-on: arc-runner-set2
 
-      - name: Remove security folder from .dacpac
-        run: |
-          sqlpackage /a:Script /sf:db/AdvWorkFlow.dacpac /p:ExcludeObjectType=Users > db/AdvWorkFlow_NoSecurity.dacpac
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Deploy Package on Test Environment
-        run: |
-          sqlpackage /a:Publish /sf:db/AdvWorkFlow_NoSecurity.dacpac /tsn:$DB_HOST,$DB_PORT /tdn:$DB_TARGET /tu:$DB_USERNAME /tp:$DB_PASSWORD /p:BlockOnPossibleDataLoss=False
+    - name: Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: db
+        path: db
 
-      - name: Set up Docker environment
-        uses: docker/build-push-action@v2
-        with:
-          repository: my-docker-image # Replace with your Docker image repository
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          build-args: |
-            ARG1=value1
-            ARG2=value2
+    - name: Install SqlPackage
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y sqlpackage
+
+    - name: Remove security folder from .dacpac
+      run: |
+        sqlpackage /a:Script /sf:db/AdvWorkFlow.dacpac /p:ExcludeObjectType=Users > db/AdvWorkFlow_NoSecurity.dacpac
+
+    - name: Deploy Package on Test Environment
+      run: |
+        sqlpackage /a:Publish /sf:db/AdvWorkFlow_NoSecurity.dacpac /tsn:$DB_HOST,$DB_PORT /tdn:$DB_TARGET /tu:$DB_USERNAME /tp:$DB_PASSWORD /p:BlockOnPossibleDataLoss=False
