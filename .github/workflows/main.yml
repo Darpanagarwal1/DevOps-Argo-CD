@@ -28,7 +28,7 @@ jobs:
     - name: Build database project
       working-directory: MyDatabaseProject
       run: |
-        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" MyDatabase.sqlproj /p:Configuration=Release
+        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" "MyDatabase.sqlproj" /p:Configuration=Release
 
 
     - name: Upload artifacts
