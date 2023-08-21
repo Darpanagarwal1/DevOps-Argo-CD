@@ -37,6 +37,7 @@ jobs:
 
   deploy:
     name: Deploy to test environment
+    needs: build
     runs-on: arc-runner-set2
 
     steps:
