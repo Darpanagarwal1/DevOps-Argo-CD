@@ -37,7 +37,7 @@ jobs:
 
     - name: Build database project
       working-directory: MyDatabaseProject
-      run: dotnet build MyDatabase.csproj --configuration Release
+      run: dotnet build MyDatabase.sqlproj --configuration Release
 
     - name: Download artifact
       uses: actions/upload-artifact@v2
