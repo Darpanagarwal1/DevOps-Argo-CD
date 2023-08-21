@@ -21,6 +21,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Remove existing dotnet packages
+      run: |
+        sudo apt remove dotnet* aspnetcore* netstandard* -y
+        sudo rm /etc/apt/sources.list.d/microsoft-prod.list
+
     - name: Install Curl
       run: sudo apt-get update && sudo apt-get install -y curl
 
@@ -37,9 +42,6 @@ jobs:
         echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages-microsoft-archive-keyring.gpg] https://packages.microsoft.com/repos/microsoft-ubuntu-$(lsb_release -cs)-prod $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/packages.microsoft.list > /dev/null
         sudo apt-get update
         sudo apt-get install -y dotnet-sdk-6.0
- 
-
-
 
     - name: Build database project
       working-directory: MyDatabaseProject
