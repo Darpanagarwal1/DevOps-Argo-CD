@@ -1,7 +1,12 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="Scripts\CreateTable.sql">
       <DependentUpon>MyDatabase.sqlproj</DependentUpon>
     </None>
+    <!-- Other project files and items -->
   </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 </Project>
