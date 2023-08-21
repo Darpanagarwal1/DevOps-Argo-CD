@@ -21,23 +21,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Setup Mono and MSBuild
+    - name: Install .NET SDK
       run: |
+        wget -q https://packages.microsoft.com/config/ubuntu/22/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+        sudo dpkg -i packages-microsoft-prod.deb
         sudo apt-get update
-        sudo apt-get install -y mono-complete
-
-    - name: List Files and Folders in Current Directory
-      run: |
-        pwd
-        ls -la
+        sudo apt-get install -y dotnet-sdk-6.0
 
     - name: Build database project
-      working-directory: MyDatabaseProject
-      run: mono /usr/bin/xbuild MyDatabase.sqlproj /p:Configuration=Release
-
+      working-directory: Axco.ClientAdmin.Publishing.Host
+      run: dotnet build MyDatabase.csproj --configuration Release
 
     - name: Download artifact
-      uses: actions/download-artifact@v2
+      uses: actions/upload-artifact@v2
       with:
         name: db
         path: db
