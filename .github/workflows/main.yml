@@ -15,54 +15,43 @@ on:
 jobs:
   deploy:
     name: Deploy to test environment
-    runs-on: arc-runner-set2
+    runs-on: arc-runner-set2 # Use self-hosted runner
+
+    container:
+      image: ubuntu:latest # Or use a base image that matches your application's requirements
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Remove conflicting packages and sources
-      run: |
-        sudo apt-get update
-        sudo apt-get remove -y dotnet-sdk-3.1 dotnet-sdk-5.0 # Remove other versions if installed
-        sudo rm /etc/apt/sources.list.d/microsoft-prod.list
+      - name: Install .NET SDK
+        run: |
+          apt-get update && apt-get install -y wget
+          wget https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+          dpkg -i packages-microsoft-prod.deb
+          apt-get update
+          apt-get install -y dotnet-sdk-6.0
+          rm packages-microsoft-prod.deb
 
-    - name: Install Curl
-      run: sudo apt-get update && sudo apt-get install -y curl
+      - name: Build database project
+        working-directory: MyDatabaseProject
+        run: dotnet build MyDatabase.sqlproj --configuration Release
 
-    - name: Install .NET SDK Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y apt-transport-https gnupg
-        sudo apt-get upgrade -y
+      - name: Download artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: db
+          path: db
 
+      - name: Install SqlPackage
+        run: |
+          apt-get update
+          apt-get install -y sqlpackage
 
-    - name: Install .NET SDK
-      run: |
-        curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/packages-microsoft-archive-keyring.gpg
-        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages-microsoft-archive-keyring.gpg] https://packages.microsoft.com/repos/microsoft-ubuntu-$(lsb_release -cs)-prod $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/packages.microsoft.list > /dev/null
-        sudo apt-get update
-        sudo apt-get install -y dotnet-sdk-6.0
+      - name: Remove security folder from .dacpac
+        run: |
+          sqlpackage /a:Script /sf:db/AdvWorkFlow.dacpac /p:ExcludeObjectType=Users > db/AdvWorkFlow_NoSecurity.dacpac
 
-    - name: Build database project
-      working-directory: MyDatabaseProject
-      run: dotnet build MyDatabase.sqlproj --configuration Release
-
-    - name: Download artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: db
-        path: db
-
-    - name: Install SqlPackage
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y sqlpackage
-
-    - name: Remove security folder from .dacpac
-      run: |
-        sqlpackage /a:Script /sf:db/AdvWorkFlow.dacpac /p:ExcludeObjectType=Users > db/AdvWorkFlow_NoSecurity.dacpac
-
-    - name: Deploy Package on Test Environment
-      run: |
-        sqlpackage /a:Publish /sf:db/AdvWorkFlow_NoSecurity.dacpac /tsn:$DB_HOST,$DB_PORT /tdn:$DB_TARGET /tu:$DB_USERNAME /tp:$DB_PASSWORD /p:BlockOnPossibleDataLoss=False
+      - name: Deploy Package on Test Environment
+        run: |
+          sqlpackage /a:Publish /sf:db/AdvWorkFlow_NoSecurity.dacpac /tsn:$DB_HOST,$DB_PORT /tdn:$DB_TARGET /tu:$DB_USERNAME /tp:$DB_PASSWORD /p:BlockOnPossibleDataLoss=False
