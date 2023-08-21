@@ -8,12 +8,12 @@ on:
     branches:
       - dev
     tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
   deploy:
     name: Deploy to test environment
-    runs-on: arc-runner-set2
+    runs-on: self-hosted
 
     steps:
     - name: Checkout code
@@ -23,6 +23,11 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y mono-complete
+
+    - name: List Files and Folders in Current Directory
+      run: |
+        pwd
+        ls -la
 
     - name: Build database project
       working-directory: src/AdvWorkFlow # Adjust the path based on your project structure
